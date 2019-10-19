@@ -1,0 +1,52 @@
+program = { operation, '\n' };
+
+operation = [ label ], whitespaces,
+    ( opcode | directive ), [ size ],
+    [ whitespaces, operand, { ',', operand } ];
+
+label = (global_label | local_label), ':';
+global_label = letter { letter_digit_underscore };
+local_label = '.', letter_digit_underscore { letter_digit_underscore };
+
+opcode = letter, { letter };
+directive = letter, { letter };
+size = '.', ( 'B', 'W', 'L' );
+
+operand = immediate | effective_address;
+immediate = '#', number;
+
+effective_address = address_register | data_register
+    | ( '(', address_register, ')' )
+    | ( '(', address_register, ')+' )
+    | ( '-(', address_register, ')' )
+    | ( '(', number, ',', address_register, ')' )
+    | ( '(', number, ',', address_register, ',', address_data_register, ')' )
+    | ( number, '.', ( 'W' | 'L' ) )
+    | ( '(', number, ',PC)' )
+    | ( '(', number, ',PC', ',', address_data_register, ')' );
+address_data_register = address_register | data_register;
+address_register = 'A', ( '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' );
+data_register = 'D', ( '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' );
+
+comment = '*', comment_content;
+comment_content = { letter_digit_underscore | whitespace };
+
+whitespace = ' ' | '\t';
+whitespaces = whitespace, { whitespace };
+letter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
+    | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N'
+    | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U'
+    | 'V' | 'W' | 'X' | 'Y' | 'Z' | 'a' | 'b'
+    | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i'
+    | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p'
+    | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w'
+    | 'x' | 'y' | 'z';
+unicode_letter = ? Unicode letter ?;
+digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+digits = digit, { digit };
+hex_digit = digit
+    | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+    | 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
+hex_digits = hex_digit, { hex_digit };
+number = digits | ( '$', hex_digits );
+letter_digit_underscore = letter | digit | '_';
